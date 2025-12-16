@@ -1,0 +1,674 @@
+[
+  {
+    "name": "孔子",
+    "birthYear": -551,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "老子",
+    "birthYear": -571,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "孙武",
+    "birthYear": -545,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "墨子",
+    "birthYear": -470,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 1
+  },
+  {
+    "name": "商鞅",
+    "birthYear": -395,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "屈原",
+    "birthYear": -340,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "秦始皇",
+    "birthYear": -259,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "刘邦",
+    "birthYear": -256,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "司马迁",
+    "birthYear": -145,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "张骞",
+    "birthYear": -164,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "张衡",
+    "birthYear": 78,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "华佗",
+    "birthYear": 145,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "曹操",
+    "birthYear": 155,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "诸葛亮",
+    "birthYear": 181,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 1
+  },
+  {
+    "name": "王羲之",
+    "birthYear": 303,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "祖冲之",
+    "birthYear": 429,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "李世民",
+    "birthYear": 598,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "玄奘",
+    "birthYear": 602,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "武则天",
+    "birthYear": 624,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "李白",
+    "birthYear": 701,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "杜甫",
+    "birthYear": 712,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "韩愈",
+    "birthYear": 768,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "白居易",
+    "birthYear": 772,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "柳宗元",
+    "birthYear": 773,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "范仲淹",
+    "birthYear": 989,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "包拯",
+    "birthYear": 999,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "王安石",
+    "birthYear": 1021,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "沈括",
+    "birthYear": 1031,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "苏轼",
+    "birthYear": 1037,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "李清照",
+    "birthYear": 1084,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "岳飞",
+    "birthYear": 1103,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "朱熹",
+    "birthYear": 1130,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "成吉思汗",
+    "birthYear": 1162,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "关汉卿",
+    "birthYear": 1234,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "郭守敬",
+    "birthYear": 1231,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "朱元璋",
+    "birthYear": 1328,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "郑和",
+    "birthYear": 1371,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "王阳明",
+    "birthYear": 1472,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "李时珍",
+    "birthYear": 1518,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "徐光启",
+    "birthYear": 1562,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "徐霞客",
+    "birthYear": 1587,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "李自成",
+    "birthYear": 1606,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "康熙",
+    "birthYear": 1654,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "曹雪芹",
+    "birthYear": 1715,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "纪晓岚",
+    "birthYear": 1724,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "林则徐",
+    "birthYear": 1785,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "曾国藩",
+    "birthYear": 1811,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "李鸿章",
+    "birthYear": 1823,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "左宗棠",
+    "birthYear": 1812,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "慈禧太后",
+    "birthYear": 1835,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "康有为",
+    "birthYear": 1858,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "梁启超",
+    "birthYear": 1873,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "孙中山",
+    "birthYear": 1866,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "袁世凯",
+    "birthYear": 1859,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "蔡元培",
+    "birthYear": 1868,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "鲁迅",
+    "birthYear": 1881,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "陈独秀",
+    "birthYear": 1879,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "胡适",
+    "birthYear": 1891,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "李大钊",
+    "birthYear": 1889,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "蒋介石",
+    "birthYear": 1887,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "毛泽东",
+    "birthYear": 1893,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "周恩来",
+    "birthYear": 1898,
+    "isLiterary": 1,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "朱德",
+    "birthYear": 1886,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "刘少奇",
+    "birthYear": 1898,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "邓小平",
+    "birthYear": 1904,
+    "isLiterary": 0,
+    "isPolitical": 1,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "钱学森",
+    "birthYear": 1911,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "钱三强",
+    "birthYear": 1913,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "邓稼先",
+    "birthYear": 1924,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "杨振宁",
+    "birthYear": 1922,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "李政道",
+    "birthYear": 1926,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "袁隆平",
+    "birthYear": 1930,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "屠呦呦",
+    "birthYear": 1930,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "莫言",
+    "birthYear": 1955,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "金庸",
+    "birthYear": 1924,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "琼瑶",
+    "birthYear": 1938,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "李敖",
+    "birthYear": 1935,
+    "isLiterary": 1,
+    "isPolitical": 0,
+    "isThinker": 1,
+    "isScientist": 0
+  },
+  {
+    "name": "郎平",
+    "birthYear": 1960,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "姚明",
+    "birthYear": 1980,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "刘翔",
+    "birthYear": 1983,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "马化腾",
+    "birthYear": 1971,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "马云",
+    "birthYear": 1964,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "任正非",
+    "birthYear": 1944,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  },
+  {
+    "name": "钟南山",
+    "birthYear": 1936,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 1
+  },
+  {
+    "name": "张桂梅",
+    "birthYear": 1957,
+    "isLiterary": 0,
+    "isPolitical": 0,
+    "isThinker": 0,
+    "isScientist": 0
+  }
+]

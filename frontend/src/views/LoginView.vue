@@ -74,8 +74,13 @@ const handleLogin = async () => {
     localStorage.setItem('username', response.data.username);
     localStorage.setItem('isAdmin', response.data.isAdmin);
 
-    // 登录成功，跳转到首页
-    router.push('/home');
+    // 根据用户类型跳转到不同页面
+    const isAdmin = response.data.isAdmin;
+    if (isAdmin === 1) {
+      router.push('/admin'); // 管理员跳转到后台
+    } else {
+      router.push('/start'); // 普通用户跳转到游戏开始页面
+    }
   } catch (err: any) {
     error.value = err.response?.data?.message || '登录失败，请检查用户名和密码';
   } finally {

@@ -74,5 +74,48 @@ export const authApi = {
   },
 };
 
+// 历史人物相关 API
+export const historicalPersonApi = {
+  // 模糊搜索历史人物
+  search: (name: string) => {
+    return api.get(`/historical-persons/search?name=${encodeURIComponent(name)}`);
+  },
+  
+  // 获取随机历史人物
+  getRandom: () => {
+    return api.get('/historical-persons/random');
+  },
+  
+  // 根据 ID 获取历史人物详情
+  getById: (id: number) => {
+    return api.get(`/historical-persons/${id}`);
+  },
+  
+  // 获取所有历史人物
+  getAll: () => {
+    return api.get('/historical-persons');
+  },
+  
+  // 添加新历史人物
+  add: (person: any) => {
+    return api.post('/historical-persons', person);
+  },
+  
+  // 删除历史人物
+  delete: (id: number) => {
+    return api.delete(`/historical-persons/${id}`);
+  },
+  
+  // 批量添加历史人物
+  batchAdd: (persons: any[]) => {
+    return api.post('/historical-persons/batch', persons);
+  },
+  
+  // 更新历史人物
+  update: (id: number, person: any) => {
+    return api.put(`/historical-persons/${id}`, person);
+  },
+};
+
 // 导出 api 实例，用于其他 API 调用
 export default api;
