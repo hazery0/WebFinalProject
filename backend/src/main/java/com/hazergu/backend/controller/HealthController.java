@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/health")
-@CrossOrigin(origins = "http://localhost:5173")
 public class HealthController {
     
     @GetMapping

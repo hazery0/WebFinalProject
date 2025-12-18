@@ -33,9 +33,9 @@ const goToLogin = () => {
   router.push('/login');
 };
 
-// 开始游戏，跳转到游戏界面
+// 开始游戏，跳转到游戏模式选择页面
 const startGame = () => {
-  router.push('/game');
+  router.push('/mode-select');
 };
 </script>
 

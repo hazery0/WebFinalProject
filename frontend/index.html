@@ -11,3 +11,9 @@
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
+<script>
+  // 解决 sockjs-client 等老库找不到 global 的问题
+  if (typeof global === 'undefined') {
+    window.global = window;
+  }
+</script>

@@ -5,6 +5,9 @@ import RegisterView from '../views/RegisterView.vue';
 import HistoricalFigureGame from '../views/HistoricalFigureGame.vue';
 import GameStart from '../views/GameStart.vue';
 import AdminView from '../views/AdminView.vue';
+import GameModeSelect from '../views/GameModeSelect.vue';
+import MultiplayerMode from '../views/MultiplayerMode.vue';
+import MultiplayerGame from '../views/MultiplayerGame.vue';
 
 const routes = [
   {
@@ -15,6 +18,21 @@ const routes = [
     path: '/start',
     name: 'game-start',
     component: GameStart,
+  },
+  {
+    path: '/mode-select',
+    name: 'mode-select',
+    component: GameModeSelect,
+  },
+  {
+    path: '/multiplayer',
+    name: 'multiplayer',
+    component: MultiplayerMode,
+  },
+  {
+    path: '/multiplayer-room/:roomId',
+    name: 'multiplayer-game',
+    component: MultiplayerGame,
   },
   {
     path: '/home',

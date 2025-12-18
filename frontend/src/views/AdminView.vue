@@ -431,10 +431,10 @@ const inputPage = ref(currentPage.value.toString());
 // 添加新历史人物
 const addHistoricalPerson = async () => {
   try {
-    // 转换birthYear为数字类型
+    // 转换birthYear为数字类型，确保不为null
     const personData = {
       ...newPerson.value,
-      birthYear: newPerson.value.birthYear === null ? null : Number(newPerson.value.birthYear)
+      birthYear: newPerson.value.birthYear === null ? 0 : Number(newPerson.value.birthYear) // 使用0替代null
     };
 
     await historicalPersonApi.add(personData);
@@ -478,10 +478,10 @@ const startEdit = (person: any) => {
 // 保存编辑
 const saveEdit = async () => {
   try {
-    // 转换birthYear为数字类型
+    // 转换birthYear为数字类型，确保不为null
     const personData = {
       ...editingPerson.value,
-      birthYear: editingPerson.value.birthYear === null ? null : Number(editingPerson.value.birthYear)
+      birthYear: editingPerson.value.birthYear === null ? 0 : Number(editingPerson.value.birthYear) // 使用0替代null
     };
 
     // 调用API更新人物信息
@@ -528,15 +528,16 @@ const handleFileChange = (event: any) => {
 
 // 执行批量导入
 const importFromFile = async () => {
-  if (!batchFile) return;
+  if (!batchFile.value) return;
 
   importLoading.value = true;
   importSuccess.value = false;
   importError.value = '';
 
   try {
-    // 读取文件内容
-    const fileContent = await readFileAsText(batchFile.value);
+    // 读取文件内容，确保batchFile.value不是null
+    const file = batchFile.value;
+    const fileContent = await readFileAsText(file);
 
     // 解析JSON
     const persons = JSON.parse(fileContent);
