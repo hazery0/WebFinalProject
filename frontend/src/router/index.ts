@@ -1,15 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import HistoricalFigureGame from '../views/HistoricalFigureGame.vue';
 import GameStart from '../views/GameStart.vue';
 import AdminView from '../views/AdminView.vue';
+import SelectGameMode from '@/views/SelectGameMode.vue';
+import MultiModeGame from '@/views/MultiModeGame.vue';
+import RoomSelect from '@/views/RoomSelect.vue';
 
 const routes = [
   {
     path: '/',
-    redirect: '/start', // 重定向到游戏开始页面
+    redirect: '/start', // 初始界面
   },
   {
     path: '/start',
@@ -42,11 +44,27 @@ const routes = [
     name: 'register',
     component: RegisterView,
   },
+  {
+    path: '/select-game-mode',
+    name: 'select-game-mode',
+    component: SelectGameMode,
+  },
+  {
+    path: '/multi-game',
+    name: 'MultiModeGame',
+    component: MultiModeGame,
+    props: (route) => ({ roomId: route.query.roomId })
+  },
+  {
+    path: '/room-select',
+    name: 'RoomSelect',
+    component: RoomSelect,
+  }
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  history: createWebHistory(),
+  routes
 });
 
 // 路由守卫，防止非管理员访问管理员页面

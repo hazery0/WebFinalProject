@@ -2,7 +2,7 @@
   <div class="historical-game-container">
     <!-- 头部 -->
     <header class="game-header">
-      <h1>历史人物猜谜游戏</h1>
+      <h1>单人模式</h1>
       <div class="login-status">
         <span @click="goToLogin" class="login-link">{{ isLoggedIn ? username : 'Not Logged In' }}</span>
       </div>

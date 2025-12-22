@@ -26,7 +26,7 @@ const router = useRouter();
 
 // 从localStorage读取登录状态
 const isLoggedIn = ref(!!localStorage.getItem('token'));
-const username = ref(localStorage.getItem('username') || 'User123');
+const username = ref(localStorage.getItem('username'));
 
 // 跳转到登录页面
 const goToLogin = () => {
@@ -35,7 +35,7 @@ const goToLogin = () => {
 
 // 开始游戏，跳转到游戏界面
 const startGame = () => {
-  router.push('/game');
+  router.push('/select-game-mode');
 };
 </script>
 

@@ -13,6 +13,9 @@ public class HistoricalPersonService {
     
     @Autowired
     private HistoricalPersonRepository historicalPersonRepository;
+
+    @Autowired
+    private HistoricalPersonRepository repository;
     
     /**
      * 模糊搜索历史人物
@@ -73,4 +76,6 @@ public class HistoricalPersonService {
     public List<HistoricalPerson> getAllHistoricalPersons() {
         return historicalPersonRepository.findAll();
     }
+
+
 }

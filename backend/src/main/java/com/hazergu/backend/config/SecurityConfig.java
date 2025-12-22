@@ -35,6 +35,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/api/historical-persons/**").permitAll()
+                        //添加了WebSocket相关路径
+                        .requestMatchers("/ws-game/**").permitAll()
+                        .requestMatchers("/ws-game/info/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -48,6 +52,10 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+
+        //添加SockJS特定的头
+        configuration.addExposedHeader("Access-Control-Allow-Origin");
+        configuration.addExposedHeader("Access-Control-Allow-Credentials");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

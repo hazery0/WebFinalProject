@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
+import { gameService } from './services/gameService';
 import { RouterView } from 'vue-router'
+
+onMounted(() => {
+  // 在应用挂载时就初始化连接
+  // 即使在 RoomSelect 页面，连接也是激活状态
+  gameService.connect();
+});
+
 </script>
 
 <template>
@@ -7,23 +16,3 @@ import { RouterView } from 'vue-router'
     <RouterView />
   </main>
 </template>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
-}
-
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-</style>
