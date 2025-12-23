@@ -12,6 +12,19 @@ public class GameRoomService {
     // 存储所有房间
     private final Map<String, RoomState> rooms = new ConcurrentHashMap<>();
     private final Random random = new Random();
+    private Map<String, List<Map<String, Object>>> roomGuesses = new ConcurrentHashMap<>();
+
+    public void addGuess(String roomId, Map<String, Object> guessRecord) {
+        roomGuesses.computeIfAbsent(roomId, k -> new ArrayList<>()).add(guessRecord);
+    }
+
+    public List<Map<String, Object>> getGuesses(String roomId) {
+        return roomGuesses.getOrDefault(roomId, new ArrayList<>());
+    }
+
+    public void clearGuesses(String roomId) {
+        roomGuesses.remove(roomId);
+    }
 
     /**
      * 创建房间
@@ -109,7 +122,9 @@ public class GameRoomService {
             roomState.setStartTime(new Date());
             roomState.setWinnerId(null);
             roomState.setEndTime(null);
-            
+            // 清空猜测历史
+            clearGuesses(roomId);
+
             // 初始化玩家状态
             for (PlayerInfo player : roomState.getPlayers()) {
                 player.setGuessCount(0);

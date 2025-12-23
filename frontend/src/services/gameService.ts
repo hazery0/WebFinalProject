@@ -222,12 +222,13 @@ class GameService {
   }
 
   sendGuess(guess: any) {
-    webSocketService.send('/app/game/guess', {
-      playerId: this.playerId,
-      roomId: this.roomId,
-      guess: guess
-    });
-  }
+  webSocketService.send('/app/game/guess', {
+    playerId: this.playerId,
+    roomId: this.roomId,
+    guess: guess.name || guess,  // 发送名称
+    guessData: guess  // 也发送完整对象用于调试
+  });
+}
 
   sendChatMessage(message: string) {
     if (!this.roomId) {

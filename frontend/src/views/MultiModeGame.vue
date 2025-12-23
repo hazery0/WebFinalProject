@@ -72,8 +72,8 @@
           <section v-if="gameActive && !gameEnded">
             <div class="game-active-header">
               <h2>🎮 游戏进行中</h2>
-              <p v-if="targetHint" class="game-hint">{{ targetHint }}</p>
-              <p v-else class="game-hint">猜猜这是哪位历史人物？</p>
+              <p v-if="gameHint" class="game-hint">{{ gameHint }}</p>
+              <p v-else class="game-hint"></p>
             </div>
 
             <!-- 搜索区域 -->
@@ -114,10 +114,11 @@
                       <th>名称</th>
                       <th>出生年份</th>
                       <th>标签</th>
+                      <th>提示</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(guess, index) in guesses" :key="index">
+                    <tr v-for="(guess, index) in formattedGuesses" :key="index">
                       <td><span class="player-tag">{{ getPlayerName(guess.playerId) }}</span></td>
                       <td :class="guess.isCorrect ? 'correct' : 'incorrect'">{{ guess.name }}</td>
                       <td>
@@ -143,6 +144,7 @@
                           科学家
                         </span>
                       </td>
+                      <td class="hint-cell">{{ guess.hint || '' }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -152,16 +154,51 @@
 
           <!-- 游戏结束 -->
           <section v-if="gameEnded" class="game-over-section">
-            <h2>游戏结束</h2>
-            <p>目标人物是：{{ targetPerson.name }}</p>
-            <p>出生年份：{{ targetPerson.birthYear }}</p>
-            <div class="tags-container">
-              <span v-if="targetPerson.isLiterary" class="tag tag-match">文学家</span>
-              <span v-if="targetPerson.isPolitical" class="tag tag-match">政治家</span>
-              <span v-if="targetPerson.isThinker" class="tag tag-match">思想家</span>
-              <span v-if="targetPerson.isScientist" class="tag tag-match">科学家</span>
+            <h2>🎉 游戏结束 🎉</h2>
+
+            <!-- 显示获胜者 -->
+            <div v-if="winnerInfo" class="winner-info">
+              <h3 v-if="winnerInfo.playerId === playerId" class="winner-you">🎊 恭喜你获胜！</h3>
+              <h3 v-else class="winner-other">🏆 获胜者：{{ winnerInfo.playerName }}</h3>
+              <p v-if="winnerInfo.guessCount > 0">猜测次数：{{ winnerInfo.guessCount }}次</p>
             </div>
-            <button @click="resetGame" class="reset-button">返回房间</button>
+            <div v-else class="winner-info">
+              <h3 class="no-winner">😢 没有获胜者</h3>
+              <p>所有玩家都已投降或猜测次数用完</p>
+            </div>
+
+            <!-- 目标人物信息 -->
+            <div class="target-person-info">
+              <h4>目标人物信息：</h4>
+              <p><strong>名称：</strong>{{ targetPerson.name }}</p>
+              <p><strong>出生年份：</strong>{{ targetPerson.birthYear }}</p>
+              <div class="tags-container">
+                <span v-if="targetPerson.isLiterary" class="tag tag-match">文学家</span>
+                <span v-if="targetPerson.isPolitical" class="tag tag-match">政治家</span>
+                <span v-if="targetPerson.isThinker" class="tag tag-match">思想家</span>
+                <span v-if="targetPerson.isScientist" class="tag tag-match">科学家</span>
+              </div>
+            </div>
+
+            <!-- 重新开始游戏按钮 -->
+            <div class="restart-control">
+              <button @click="restartGame" class="restart-button">🔄 重新开始游戏</button>
+            </div>
+            <div class="restart-control">
+              <p class="hint-text">等待重新开始游戏...</p>
+            </div>
+
+            <!-- 猜测历史 -->
+            <div class="final-guesses">
+              <h4>本局游戏猜测记录：</h4>
+              <div class="final-guesses-list">
+                <div v-for="(guess, index) in formattedGuesses" :key="index" class="final-guess-item">
+                  <span class="player-name">{{ getPlayerName(guess.playerId) }}：</span>
+                  <span :class="guess.isCorrect ? 'correct-guess' : 'incorrect-guess'">{{ guess.name }}</span>
+                  <span v-if="guess.hint" class="hint-text">({{ guess.hint }})</span>
+                </div>
+              </div>
+            </div>
           </section>
         </div>
 
@@ -221,7 +258,8 @@ const targetPerson = ref<any>({
 });
 
 // --- 提示信息 ---
-const targetHint = ref('');
+const gameHint = ref(''); // 改名为 gameHint，避免泄露答案
+const winnerInfo = ref<any>(null); // 获胜者信息
 
 // --- 搜索与交互 ---
 const searchQuery = ref('');
@@ -262,6 +300,51 @@ const gameWon = computed(() => {
   return myLastGuess?.isCorrect || false;
 });
 
+// 格式化猜测历史，用于显示
+const formattedGuesses = computed(() => {
+  return guesses.value.map(guess => {
+    return {
+      ...guess,
+      hint: generateHint(guess)
+    };
+  });
+});
+
+// 生成提示信息
+const generateHint = (guess: any) => {
+  if (guess.isCorrect) return '猜对了！';
+
+  let hint = '';
+  const target = targetPerson.value;
+
+  // 比较出生年份
+  if (target.birthYear && guess.birthYear) {
+    if (target.birthYear > guess.birthYear) {
+      hint += '目标人物出生得更晚。 ';
+    } else if (target.birthYear < guess.birthYear) {
+      hint += '目标人物出生得更早。 ';
+    } else {
+      hint += '出生年份相同！ ';
+    }
+  }
+
+  // 比较类别
+  if (target.isLiterary === 1 && guess.isLiterary === 0) {
+    hint += '目标人物是文学家。 ';
+  }
+  if (target.isPolitical === 1 && guess.isPolitical === 0) {
+    hint += '目标人物是政治家。 ';
+  }
+  if (target.isThinker === 1 && guess.isThinker === 0) {
+    hint += '目标人物是思想家。 ';
+  }
+  if (target.isScientist === 1 && guess.isScientist === 0) {
+    hint += '目标人物是科学家。 ';
+  }
+
+  return hint.trim();
+};
+
 // --- 核心逻辑：处理 WebSocket 消息 ---
 const handleMessage = (data: any) => {
   console.log('MultiMode收到消息:', data);
@@ -270,7 +353,27 @@ const handleMessage = (data: any) => {
     const state = data.roomState;
     players.value = state.players || [];
     gameActive.value = state.gameActive || false;
-    guesses.value = state.guesses || [];
+    gameEnded.value = state.winnerId !== undefined && !state.gameActive;
+
+    // 从服务器获取猜测记录
+    if (state.guesses) {
+      guesses.value = state.guesses.map((guess: any) => {
+        // 确保猜测包含完整的人物信息
+        const guessedPerson = guess.guessedPerson || guess.guess;
+        return {
+          playerId: guess.playerId,
+          name: guessedPerson.name || guess.guess,
+          birthYear: guessedPerson.birthYear,
+          isLiterary: guessedPerson.isLiterary || 0,
+          isPolitical: guessedPerson.isPolitical || 0,
+          isThinker: guessedPerson.isThinker || 0,
+          isScientist: guessedPerson.isScientist || 0,
+          isCorrect: guess.isCorrect || false
+        };
+      });
+    } else {
+      guesses.value = [];
+    }
 
     // 更新目标人物（如果服务器传了）
     if (state.targetPerson) {
@@ -286,6 +389,26 @@ const handleMessage = (data: any) => {
       }
     }
 
+    // 更新房主状态
+    if (state.players) {
+      const me = state.players.find((p: any) => p.id === playerId.value);
+      if (me) {
+        isRoomOwner.value = me.isRoomOwner || false;
+      }
+    }
+
+    // 如果是游戏结束状态，获取获胜者信息
+    if (state.winnerId) {
+      const winner = state.players.find((p: any) => p.id === state.winnerId);
+      if (winner) {
+        winnerInfo.value = {
+          playerId: winner.id,
+          playerName: winner.name,
+          guessCount: winner.guessCount || 0
+        };
+      }
+    }
+
     isLoading.value = false;
     hasJoined.value = true;
   } else if (data.type === 'GAME_STARTED') {
@@ -296,6 +419,8 @@ const handleMessage = (data: any) => {
     guesses.value = [];
     searchQuery.value = '';
     searchResults.value = [];
+    gameHint.value = data.message || '猜猜这是哪位历史人物？';
+    winnerInfo.value = null;
 
     // 如果有目标人物信息，更新它
     if (data.targetPerson) {
@@ -303,13 +428,28 @@ const handleMessage = (data: any) => {
     }
 
     console.log('游戏开始!');
-  } else if (data.type === 'TARGET_PERSON_HINT') {
-    // 处理目标人物提示
-    console.log('收到目标人物提示:', data.hint);
-    targetHint.value = data.hint || '';
   } else if (data.type === 'GUESS_RESULT') {
-    // 处理猜测结果
-    guesses.value = data.guesses || [];
+    // 处理猜测结果 - 使用服务器返回的完整猜测数据
+    if (data.guesses) {
+      guesses.value = data.guesses.map((guess: any) => {
+        const guessedPerson = guess.guessedPerson || guess.guess;
+        return {
+          playerId: guess.playerId,
+          name: guessedPerson.name || guess.guess,
+          birthYear: guessedPerson.birthYear,
+          isLiterary: guessedPerson.isLiterary || 0,
+          isPolitical: guessedPerson.isPolitical || 0,
+          isThinker: guessedPerson.isThinker || 0,
+          isScientist: guessedPerson.isScientist || 0,
+          isCorrect: guess.isCorrect || false
+        };
+      });
+    }
+
+    // 更新提示信息
+    if (data.hint) {
+      gameHint.value = data.hint;
+    }
 
     // 检查是否猜对
     if (data.isCorrect) {
@@ -319,10 +459,46 @@ const handleMessage = (data: any) => {
         gameWon.value = true;
       }
     }
-  } else if (data.type === 'GAME_OVER') {
-    gameActive.value = false;
-    gameEnded.value = true;
-    alert(`游戏结束！获胜者: ${data.winnerName}`);
+
+    // 检查游戏是否结束
+    if (data.gameEnded) {
+      gameActive.value = false;
+      gameEnded.value = true;
+
+      // 设置获胜者信息
+      if (data.winner) {
+        const winner = players.value.find(p => p.id === data.winner);
+        if (winner) {
+          winnerInfo.value = {
+            playerId: winner.id,
+            playerName: winner.name,
+            guessCount: winner.guessCount || 0
+          };
+        }
+      }
+
+      targetPerson.value = data.targetPerson || targetPerson.value;
+    }
+  } else if (data.type === 'SURRENDER_RESULT') {
+    // 处理投降结果
+    if (data.gameEnded) {
+      gameActive.value = false;
+      gameEnded.value = true;
+
+      // 设置获胜者信息
+      if (data.winner) {
+        const winner = players.value.find(p => p.id === data.winner);
+        if (winner) {
+          winnerInfo.value = {
+            playerId: winner.id,
+            playerName: winner.name,
+            guessCount: winner.guessCount || 0
+          };
+        }
+      }
+
+      targetPerson.value = data.targetPerson || targetPerson.value;
+    }
   } else if (data.type === 'PLAYER_LEFT' || data.type === 'ROOM_DISSOLVED') {
     if (data.message === '房间已解散') {
       alert('房间已被解散，将返回房间选择页面');
@@ -342,6 +518,26 @@ const handleMessage = (data: any) => {
     } else {
       isRoomOwner.value = false;
     }
+  } else if (data.type === 'PLAYER_JOINED') {
+    console.log('MultiMode收到消息:', data);
+
+    if (data.type === 'PLAYER_JOINED') {
+      // 处理玩家加入消息
+      const newPlayer = {
+        id: data.playerId,
+        name: data.playerName,
+        isRoomOwner: data.isRoomOwner || false
+      };
+
+      // 检查是否已存在该玩家
+      const existingIndex = players.value.findIndex(p => p.id === data.playerId);
+      if (existingIndex === -1) {
+        players.value.push(newPlayer);
+        console.log(`玩家 ${data.playerName} 已加入房间`);
+      }
+
+      return;
+    }
   }
 };
 
@@ -354,8 +550,12 @@ const scrollToBottom = () => {
   });
 };
 
-const getPlayerName = (pid: string) => {
+const getPlayerName = (pid: string, senderName?: string) => {
   const p = players.value.find(x => x.id === pid);
+  // 如果找不到玩家，尝试使用 senderName
+  if (!p && senderName) {
+    return senderName;
+  }
   return p ? p.name : '未知玩家';
 };
 
@@ -396,18 +596,17 @@ const sendChatMessage = () => {
   chatInput.value = '';
 };
 
-const startGame = () => gameService.startGame();
+const startGame = () => {
+  console.log('开始游戏按钮被点击');
+  gameService.startGame();
+};
 
 const surrender = () => {
   if (confirm('确定要投降吗？')) gameService.surrender();
 };
 
-const resetGame = () => {
-  gameActive.value = false;
-  gameEnded.value = false;
-  guesses.value = [];
-  searchQuery.value = '';
-  searchResults.value = [];
+const restartGame = () => {
+  gameService.startGame();
 };
 
 // --- 连接管理 ---
@@ -502,7 +701,7 @@ onMounted(async () => {
 
   const chatHandler = (data: any) => {
     console.log('收到聊天消息事件:', data);
-    const senderName = getPlayerName(data.playerId) || data.senderName || '未知玩家';
+    const senderName = getPlayerName(data.playerId, data.senderName) || '未知玩家';
     chatMessages.value.push({
       sender: senderName,
       content: data.message,
@@ -535,6 +734,8 @@ onMounted(async () => {
     gameEnded.value = false;
     canGuess.value = true;
     guesses.value = [];
+    gameHint.value = data.message || '猜猜这是哪位历史人物？';
+    winnerInfo.value = null;
 
     if (data.targetPerson) {
       targetPerson.value = data.targetPerson;
@@ -608,461 +809,29 @@ onUnmounted(() => {
 
 <style scoped>
 .historical-game-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: sans-serif;
-  background-color: #f8f9fa;
-  min-height: 100vh;
-  position: relative;
-}
-
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-}
-
-.room-status-bar {
-  display: flex;
-  gap: 10px;
-  margin-top: 5px;
-  flex-wrap: wrap;
-}
-
-.badge {
-  padding: 4px 10px;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  background: #ddd;
-}
-
-.status-active {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-wait {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status-disconnected {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.win-badge {
-  background: #4CAF50;
-  color: white;
-  margin-left: 8px;
-}
-
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.avatar-small {
-  width: 30px;
-  height: 30px;
-  background: #4CAF50;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.game-layout {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 20px;
-}
-
-.players-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.player-card {
-  background: white;
-  padding: 10px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.player-card:hover {
-  transform: translateY(-2px);
-}
-
-.is-me {
-  border: 2px solid #4CAF50;
-}
-
-.owner-tag {
-  font-size: 0.6rem;
-  background: #ff9800;
-  color: white;
-  padding: 1px 4px;
-  border-radius: 3px;
-  margin-left: 4px;
-}
-
-.no-players {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-  font-style: italic;
-}
-
-/* 游戏进行中标题样式 */
-.game-active-header {
-  text-align: center;
-  margin-bottom: 20px;
-  padding: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 10px;
-}
-
-.game-active-header h2 {
-  margin: 0 0 10px 0;
-  font-size: 1.5rem;
-}
-
-.game-hint {
-  margin: 0;
-  font-size: 1rem;
-  opacity: 0.9;
-}
-
-/* 搜索区域 */
-.search-section {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.search-container {
-  display: flex;
-  gap: 10px;
-  max-width: 600px;
-  margin: 0 auto 10px;
-}
-
-.search-input {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 16px;
-}
-
-.search-button {
-  padding: 12px 24px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.search-button:hover {
-  background-color: #45a049;
-}
-
-.search-results {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 600px;
-  width: 100%;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 0 0 6px 6px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.search-result-item {
-  padding: 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.search-result-item:hover {
-  background: #f5f5f5;
-}
-
-/* 胜利提示 */
-.win-alert {
-  background-color: #d4edda;
-  color: #155724;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  text-align: center;
-  border: 1px solid #c3e6cb;
-}
-
-.win-alert h3 {
-  margin-top: 0;
-  font-size: 1.5rem;
-}
-
-.table-container {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  overflow-x: auto;
-}
-
-.guess-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 800px;
-}
-
-.guess-table th {
-  text-align: left;
-  border-bottom: 2px solid #eee;
-  padding: 10px;
-  background: #f8f9fa;
-  font-weight: 600;
-}
-
-.guess-table td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.correct {
-  color: #2ecc71;
-  font-weight: bold;
-}
-
-.incorrect {
-  color: #e74c3c;
-}
-
-.player-tag {
-  background: #e3f2fd;
-  color: #1976d2;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-}
-
-/* 出生年份比较 */
-.year-comparison {
-  margin-left: 8px;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-/* 标签样式 */
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: bold;
-}
-
-.tag-match {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.tag-no-match {
-  background-color: #e2e3e5;
-  color: #6c757d;
-}
-
-/* 游戏结束区域 */
-.game-over-section {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.reset-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.reset-button:hover {
-  background-color: #45a049;
-}
-
-.chat-sidebar {
-  background: white;
-  border-radius: 12px;
-  height: 600px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.chat-header {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  font-weight: bold;
-  background: #f8f9fa;
-  border-radius: 12px 12px 0 0;
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 15px;
-}
-
-.chat-item {
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-
-.chat-user {
-  font-weight: bold;
-  color: #3498db;
-  margin-right: 5px;
-}
-
-.chat-content {
+  height: 100vh;
+  padding: 16px;
   color: #333;
 }
 
-.chat-input-area {
-  padding: 15px;
-  display: flex;
-  gap: 10px;
-  border-top: 1px solid #eee;
-  background: #f8f9fa;
-  border-radius: 0 0 12px 12px;
-}
-
-.chat-input-area input {
-  flex: 1;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  outline: none;
-  font-size: 14px;
-}
-
-.chat-input-area input:disabled {
-  background: #f0f0f0;
-  cursor: not-allowed;
-}
-
-.chat-input-area button {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.chat-input-area button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.chat-input-area button:hover:not(:disabled) {
-  background: #45a049;
-}
-
-.surrender-button {
-  background: #ff4757;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.surrender-button:hover {
-  background: #ff3742;
-}
-
-.hint-text {
-  color: #666;
-  font-style: italic;
-}
-
-/* 开始游戏按钮样式 */
-.start-game-control {
-  margin: 20px 0;
-}
-
-.start-game-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.start-game-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-}
-
-/* 加载状态 */
 .loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 1.5em;
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #3498db;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
   border-radius: 50%;
+  width: 60px;
+  height: 60px;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
@@ -1074,6 +843,670 @@ onUnmounted(() => {
 
   100% {
     transform: rotate(360deg);
+  }
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.room-info h1 {
+  margin: 0;
+  font-size: 1.8em;
+  color: #2c3e50;
+}
+
+.room-status-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.room-id {
+  background: #4CAF50;
+  color: white;
+}
+
+.player-count {
+  background: #2196F3;
+  color: white;
+}
+
+.status {
+  background: #e0e0e0;
+  color: #555;
+}
+
+.status-active {
+  background: #4CAF50;
+  color: white;
+}
+
+.status-wait {
+  background: #FF9800;
+  color: white;
+}
+
+.status-disconnected {
+  background: #f44336;
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #3498db;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.username {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.win-badge {
+  background: #FFD700;
+  color: #000;
+  font-weight: bold;
+  padding: 4px 8px;
+}
+
+.surrender-button {
+  padding: 8px 16px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.surrender-button:hover {
+  background: #d32f2f;
+}
+
+.game-layout {
+  display: flex;
+  flex: 1;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.main-area {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chat-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+  max-width: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.room-section,
+.game-active-header,
+.game-over-section {
+  margin-bottom: 20px;
+}
+
+.waiting-header {
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.hint-text {
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 8px;
+}
+
+.start-game-button {
+  padding: 12px 24px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 15px;
+}
+
+.start-game-button:hover {
+  background: #388E3C;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.player-card {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  border: 2px solid transparent;
+}
+
+.player-card:hover {
+  transform: translateY(-5px);
+}
+
+.player-card.is-me {
+  border-color: #3498db;
+  background: #e8f4fc;
+}
+
+.player-card.is-owner {
+  border-color: #FF9800;
+}
+
+.player-avatar {
+  width: 50px;
+  height: 50px;
+  background: #3498db;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0 auto 10px;
+}
+
+.player-name {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.owner-tag,
+.me-tag {
+  font-size: 0.8em;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 5px;
+}
+
+.owner-tag {
+  background: #FF9800;
+  color: white;
+}
+
+.me-tag {
+  background: #3498db;
+  color: white;
+}
+
+.ready-indicator {
+  color: #4CAF50;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.no-players {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+  font-style: italic;
+}
+
+.game-active-header {
+  text-align: center;
+  padding: 15px;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  color: white;
+  border-radius: 10px;
+}
+
+.game-hint {
+  font-size: 1.1em;
+  margin-top: 10px;
+}
+
+.search-section {
+  position: relative;
+  margin: 20px 0;
+}
+
+.search-container {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.search-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.search-button {
+  padding: 12px 24px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.search-button:hover {
+  background: #2980b9;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+}
+
+.search-result-item {
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-result-item:hover {
+  background: #f5f5f5;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.win-alert {
+  background: #4CAF50;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.result-section {
+  margin-top: 20px;
+}
+
+.game-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.guess-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.guess-table th {
+  background: #f8f9fa;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.guess-table td {
+  padding: 15px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.guess-table tr:hover {
+  background: #f8f9fa;
+}
+
+.player-tag {
+  background: #e9ecef;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.9em;
+}
+
+.correct {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.incorrect {
+  color: #f44336;
+}
+
+.year-comparison {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tag {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.tag-match {
+  background: #4CAF50;
+  color: white;
+}
+
+.tag-no-match {
+  background: #f44336;
+  color: white;
+}
+
+.hint-cell {
+  max-width: 200px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.game-over-section {
+  text-align: center;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.winner-info {
+  margin: 20px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.winner-you {
+  color: #4CAF50;
+}
+
+.winner-other {
+  color: #FF9800;
+}
+
+.no-winner {
+  color: #666;
+}
+
+.target-person-info {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  text-align: left;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.restart-control {
+  margin: 20px 0;
+}
+
+.restart-button {
+  padding: 12px 30px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.restart-button:hover {
+  background: #2980b9;
+}
+
+.final-guesses {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  text-align: left;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.final-guesses-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 15px;
+}
+
+.final-guess-item {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.final-guess-item:last-child {
+  border-bottom: none;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.correct-guess {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.incorrect-guess {
+  color: #f44336;
+}
+
+.chat-header {
+  padding: 15px;
+  background: #3498db;
+  color: white;
+  font-weight: bold;
+  border-radius: 12px 12px 0 0;
+  text-align: center;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-item {
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+  padding: 10px 15px;
+  border-radius: 10px;
+  word-break: break-word;
+}
+
+.chat-user {
+  font-weight: 600;
+  color: #3498db;
+  font-size: 0.9em;
+}
+
+.chat-content {
+  margin-top: 5px;
+  color: #333;
+}
+
+.chat-input-area {
+  display: flex;
+  padding: 15px;
+  gap: 10px;
+  border-top: 1px solid #eee;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+.chat-input-area input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.chat-input-area input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.chat-input-area button {
+  padding: 10px 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.chat-input-area button:hover {
+  background: #388E3C;
+}
+
+.chat-input-area button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .game-layout {
+    flex-direction: column;
+  }
+
+  .chat-sidebar {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .game-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .room-status-bar {
+    justify-content: center;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
 </style>

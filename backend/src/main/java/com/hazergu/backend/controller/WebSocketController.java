@@ -246,12 +246,25 @@ public class WebSocketController {
                 // 增加猜测次数
                 gameRoomService.incrementGuessCount(roomId, playerId);
 
+                // 添加猜测历史到房间
+                Map<String, Object> guessRecord = new HashMap<>();
+                guessRecord.put("playerId", playerId);
+                guessRecord.put("guess", guessedPerson);
+                guessRecord.put("isCorrect", guessedPerson.getId().equals(targetPerson.getId()));
+                guessRecord.put("timestamp", System.currentTimeMillis());
+                gameRoomService.addGuess(roomId, guessRecord);
+
+                // 获取更新后的猜测列表
+                List<Map<String, Object>> allGuesses = gameRoomService.getGuesses(roomId);
+
                 response.put("type", "GUESS_RESULT");
                 response.put("playerId", playerId);
                 response.put("guess", guessName);
                 response.put("isCorrect", guessedPerson.getId().equals(targetPerson.getId()));
                 response.put("guessCount", player != null ? player.getGuessCount() + 1 : 0);
                 response.put("maxGuessCount", roomState.getMaxGuessCount());
+                response.put("guesses", allGuesses); // 发送所有猜测记录
+                response.put("guessedPerson", guessedPerson); // 发送猜测的人物信息
 
                 if (guessedPerson.getId().equals(targetPerson.getId())) {
                     // 猜对了！
@@ -266,7 +279,6 @@ public class WebSocketController {
                     // 猜错了，给出线索
                     response.put("message", "猜错了！");
                     response.put("hint", generateHint(targetPerson, guessedPerson));
-                    response.put("guessedPerson", guessedPerson);
 
                     // 检查游戏是否结束（猜测次数用完）
                     boolean gameEnded = gameRoomService.checkGameEnd(roomId);
