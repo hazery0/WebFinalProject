@@ -68,7 +68,7 @@ const handleRegister = async () => {
   error.value = '';
   
   try {
-    await axios.post('http://localhost:8080/api/auth/register', form.value);
+    await axios.post('/api/auth/register', form.value);
     
     // 注册成功，跳转到登录页面
     router.push('/login');

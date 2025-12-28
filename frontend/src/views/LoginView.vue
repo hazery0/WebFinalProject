@@ -67,7 +67,7 @@ const handleLogin = async () => {
   error.value = '';
 
   try {
-    const response = await axios.post('http://localhost:8080/api/auth/login', form.value);
+    const response = await axios.post('/api/auth/login', form.value);
 
     // 保存 token 到本地存储
     localStorage.setItem('token', response.data.token);

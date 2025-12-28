@@ -1,0 +1,32 @@
+[Unit]
+Description=Web Final Project Backend Service
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+# 服务用户
+User=www-data
+# 用户组
+Group=www-data
+# 工作目录
+WorkingDirectory=/opt/web-final-project
+# 执行命令
+ExecStart=/usr/bin/java -jar /opt/web-final-project/backend-0.0.1-SNAPSHOT.jar
+# 重启策略
+Restart=always
+# 重启间隔时间（秒）
+RestartSec=5
+# 启动超时时间
+TimeoutStartSec=300
+# 停止超时时间
+TimeoutStopSec=300
+# 环境变量
+Environment="JAVA_OPTS=-Xms512m -Xmx1024m"
+Environment="SPRING_PROFILES_ACTIVE=prod"
+# 日志配置
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=web-final-backend
+
+[Install]
+WantedBy=multi-user.target
