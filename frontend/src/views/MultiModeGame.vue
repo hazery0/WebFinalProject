@@ -7,6 +7,67 @@
       <p v-else>正在加入房间...</p>
     </div>
 
+    <!-- 筛选界面 -->
+    <div v-if="showFilter" class="filter-overlay">
+      <div class="filter-container">
+        <div class="filter-header">
+          <h2>人物筛选条件</h2>
+          <button @click="toggleFilter" class="close-button">×</button>
+        </div>
+        <div class="filter-content">
+          <div class="filter-section">
+            <h3>出生年份范围</h3>
+            <div class="year-range">
+              <div class="range-inputs">
+                <div>
+                  <label>起始年份:</label>
+                  <input type="number" v-model.number="filterOptions.minYear" min="-2000" max="3000" />
+                </div>
+                <div>
+                  <label>结束年份:</label>
+                  <input type="number" v-model.number="filterOptions.maxYear" min="-2000" max="3000" />
+                </div>
+              </div>
+              <div class="range-slider">
+                <input type="range" v-model.number="filterOptions.minYear" min="-2000" max="3000" />
+                <input type="range" v-model.number="filterOptions.maxYear" min="-2000" max="3000" />
+              </div>
+              <div class="range-display">
+                <span>范围: {{ filterOptions.minYear }} - {{ filterOptions.maxYear }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <h3>人物类型</h3>
+            <div class="tags-filter">
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="filterOptions.isLiterary" />
+                <span class="tag tag-literary">文学家</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="filterOptions.isPolitical" />
+                <span class="tag tag-political">政治家</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="filterOptions.isThinker" />
+                <span class="tag tag-thinker">思想家</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="filterOptions.isScientist" />
+                <span class="tag tag-scientist">科学家</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button @click="resetFilter" class="reset-button">重置</button>
+            <button @click="applyFilter" class="apply-button">应用</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 主内容 -->
     <div v-else>
       <header class="game-header">
@@ -28,6 +89,7 @@
             <span class="username">{{ username }}</span>
             <span v-if="gameWon" class="badge win-badge">获胜!</span>
           </div>
+          <button v-if="!gameActive || gameEnded" @click="toggleFilter" class="filter-button">筛选条件</button>
           <button @click="leaveRoom" class="surrender-button">离开房间</button>
         </div>
       </header>
@@ -39,7 +101,7 @@
             <div class="waiting-header">
               <h2>等待玩家加入</h2>
               <div>
-                <p class="hint-text">所有玩家都可以开始游戏（测试模式）</p>
+                <p class="hint-text">玩家可以开始游戏</p>
                 <p>当前房主: {{ getRoomOwnerName() }}</p>
                 <div class="start-game-control">
                   <button @click="startGame" class="start-game-button">
@@ -71,10 +133,8 @@
           <!-- 游戏进行中 -->
           <section v-if="gameActive && !gameEnded">
             <div class="game-active-header">
-              <h2>🎮 游戏进行中</h2>
-              <p v-if="gameHint" class="game-hint">{{ gameHint }}</p>
-              <p v-else class="game-hint"></p>
-            </div>
+          <h2>🎮 游戏进行中</h2>
+        </div>
 
             <!-- 搜索区域 -->
             <div class="search-section">
@@ -114,7 +174,6 @@
                       <th>名称</th>
                       <th>出生年份</th>
                       <th>标签</th>
-                      <th>提示</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -144,7 +203,6 @@
                           科学家
                         </span>
                       </td>
-                      <td class="hint-cell">{{ guess.hint || '' }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -193,10 +251,9 @@
               <h4>本局游戏猜测记录：</h4>
               <div class="final-guesses-list">
                 <div v-for="(guess, index) in formattedGuesses" :key="index" class="final-guess-item">
-                  <span class="player-name">{{ getPlayerName(guess.playerId) }}：</span>
-                  <span :class="guess.isCorrect ? 'correct-guess' : 'incorrect-guess'">{{ guess.name }}</span>
-                  <span v-if="guess.hint" class="hint-text">({{ guess.hint }})</span>
-                </div>
+              <span class="player-name">{{ getPlayerName(guess.playerId) }}：</span>
+              <span :class="guess.isCorrect ? 'correct-guess' : 'incorrect-guess'">{{ guess.name }}</span>
+            </div>
               </div>
             </div>
           </section>
@@ -261,6 +318,17 @@ const targetPerson = ref<any>({
 const gameHint = ref(''); // 改名为 gameHint，避免泄露答案
 const winnerInfo = ref<any>(null); // 获胜者信息
 
+// --- 筛选功能 ---
+const showFilter = ref(false);
+const filterOptions = ref({
+  minYear: -2000,
+  maxYear: 2000,
+  isLiterary: false,
+  isPolitical: false,
+  isThinker: false,
+  isScientist: false
+});
+
 // --- 搜索与交互 ---
 const searchQuery = ref('');
 const searchResults = ref<any[]>([]);
@@ -304,46 +372,10 @@ const gameWon = computed(() => {
 const formattedGuesses = computed(() => {
   return guesses.value.map(guess => {
     return {
-      ...guess,
-      hint: generateHint(guess)
+      ...guess
     };
   });
 });
-
-// 生成提示信息
-const generateHint = (guess: any) => {
-  if (guess.isCorrect) return '猜对了！';
-
-  let hint = '';
-  const target = targetPerson.value;
-
-  // 比较出生年份
-  if (target.birthYear && guess.birthYear) {
-    if (target.birthYear > guess.birthYear) {
-      hint += '目标人物出生得更晚。 ';
-    } else if (target.birthYear < guess.birthYear) {
-      hint += '目标人物出生得更早。 ';
-    } else {
-      hint += '出生年份相同！ ';
-    }
-  }
-
-  // 比较类别
-  if (target.isLiterary === 1 && guess.isLiterary === 0) {
-    hint += '目标人物是文学家。 ';
-  }
-  if (target.isPolitical === 1 && guess.isPolitical === 0) {
-    hint += '目标人物是政治家。 ';
-  }
-  if (target.isThinker === 1 && guess.isThinker === 0) {
-    hint += '目标人物是思想家。 ';
-  }
-  if (target.isScientist === 1 && guess.isScientist === 0) {
-    hint += '目标人物是科学家。 ';
-  }
-
-  return hint.trim();
-};
 
 // --- 核心逻辑：处理 WebSocket 消息 ---
 const handleMessage = (data: any) => {
@@ -557,6 +589,35 @@ const getPlayerName = (pid: string, senderName?: string) => {
     return senderName;
   }
   return p ? p.name : '未知玩家';
+};
+
+// --- 筛选功能方法 ---
+const toggleFilter = () => {
+  showFilter.value = !showFilter.value;
+};
+
+const resetFilter = () => {
+  filterOptions.value = {
+    minYear: -2000,
+    maxYear: 2000,
+    isLiterary: false,
+    isPolitical: false,
+    isThinker: false,
+    isScientist: false
+  };
+};
+
+const applyFilter = () => {
+  // 确保最小年份不大于最大年份
+  if (filterOptions.value.minYear > filterOptions.value.maxYear) {
+    alert('起始年份不能大于结束年份！');
+    return;
+  }
+
+  // 发送筛选条件到服务器
+  gameService.setFilter(filterOptions.value);
+  toggleFilter();
+  alert('筛选条件已应用！');
 };
 
 // --- 用户操作 ---
@@ -1483,6 +1544,252 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
+/* 筛选功能样式 */
+.filter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.filter-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.filter-header h2 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2em;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-content {
+  padding: 20px;
+}
+
+.filter-section {
+  margin-bottom: 25px;
+}
+
+.filter-section h3 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 1.2em;
+}
+
+.year-range {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.range-inputs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.range-inputs > div {
+  flex: 1;
+}
+
+.range-inputs label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.range-inputs input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  transition: border-color 0.3s;
+}
+
+.range-inputs input[type="number"]:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.range-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.range-slider input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.range-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.range-slider input[type="range"]::-webkit-slider-thumb:hover {
+  background: #2980b9;
+}
+
+.range-display {
+  text-align: center;
+  font-weight: 600;
+  color: #3498db;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.tags-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.checkbox-label:hover {
+  background: #e9ecef;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.tag-literary {
+  background: #4CAF50;
+  color: white;
+}
+
+.tag-political {
+  background: #2196F3;
+  color: white;
+}
+
+.tag-thinker {
+  background: #FF9800;
+  color: white;
+}
+
+.tag-scientist {
+  background: #9C27B0;
+  color: white;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.reset-button,
+.apply-button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-size: 1em;
+}
+
+.reset-button {
+  background: #6c757d;
+  color: white;
+}
+
+.reset-button:hover {
+  background: #5a6268;
+}
+
+.apply-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.apply-button:hover {
+  background: #388E3C;
+}
+
+.filter-button {
+  padding: 8px 16px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.filter-button:hover {
+  background: #2980b9;
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .game-layout {
@@ -1507,6 +1814,15 @@ onUnmounted(() => {
 
   .players-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .range-inputs {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .filter-actions {
+    flex-direction: column;
   }
 }
 </style>

@@ -2,46 +2,46 @@
   <div class="auth-container">
     <div class="auth-card">
       <h2>用户注册</h2>
-      
+
       <form @submit.prevent="handleRegister" class="auth-form">
         <div class="form-group">
           <label for="username">用户名</label>
-          <input 
-            type="text" 
-            id="username" 
-            v-model="form.username" 
+          <input
+            type="text"
+            id="username"
+            v-model="form.username"
             placeholder="请输入用户名"
             required
             class="form-input"
           />
         </div>
-        
+
         <div class="form-group">
           <label for="password">密码</label>
-          <input 
-            type="password" 
-            id="password" 
-            v-model="form.password" 
+          <input
+            type="password"
+            id="password"
+            v-model="form.password"
             placeholder="请输入密码（至少6位）"
             required
             minlength="6"
             class="form-input"
           />
         </div>
-        
+
         <div v-if="error" class="error-message">
           {{ error }}
         </div>
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           :disabled="loading"
           class="auth-button"
         >
           {{ loading ? '注册中...' : '注册' }}
         </button>
       </form>
-      
+
       <div class="auth-footer">
         已有账号？
         <router-link to="/login" class="link">立即登录</router-link>
@@ -66,10 +66,10 @@ const error = ref('');
 const handleRegister = async () => {
   loading.value = true;
   error.value = '';
-  
+
   try {
     await axios.post('/api/auth/register', form.value);
-    
+
     // 注册成功，跳转到登录页面
     router.push('/login');
   } catch (err: any) {
